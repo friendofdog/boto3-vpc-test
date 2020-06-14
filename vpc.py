@@ -4,35 +4,37 @@ class AwsVpc:
     def __init__(self):
         self.ec2 = boto3.resource('ec2')
         self.ec2_client = boto3.client('ec2')
-        self.vpc = self.aws_create_vpc()
-        self.internetgateway = self.aws_create_internet_gateway()
-        self.subnet = self.aws_create_subnet()
-        self.securitygroup = self.aws_create_security_group()
-        self.routetable = self.aws_create_route_table()
+        self.vpc = ''
+        self.internetgateway = ''
+        self.subnet = ''
+        self.securitygroup = ''
+        self.routetable = ''
 
-    def aws_create_vpc(self):
-        return self.ec2.create_vpc(
-            CidrBlock='172.16.0.0/16'
+    def aws_create_vpc(self, ip='172.10.0.0/16'):
+        vpc = self.ec2.create_vpc(
+            CidrBlock=ip
         )
+        self.vpc = vpc
 
     def aws_create_internet_gateway(self):
-        return self.ec2.create_internet_gateway()
+        internetgateway = self.ec2.create_internet_gateway()
+        self.internetgateway = internetgateway
 
     def aws_create_subnet(self):
-        return self.ec2.create_subnet(
+        self.subnet = self.ec2.create_subnet(
             CidrBlock='172.16.1.0/24',
             VpcId=self.vpc.id
         )
 
     def aws_create_security_group(self):
-        return self.ec2.create_security_group(
+        self.securitygroup = self.ec2.create_security_group(
             GroupName='SSH-ONLY',
             Description='only allow SSH traffic',
             VpcId=self.vpc.id
         )
 
     def aws_create_route_table(self):
-        return self.vpc.create_route_table()
+        self.routetable = self.vpc.create_route_table()
 
     # assign a name to our VPC
     def tag_vpc(self):
