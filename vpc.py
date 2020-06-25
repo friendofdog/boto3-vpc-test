@@ -21,11 +21,12 @@ class AwsVpc:
         internetgateway = self.ec2.create_internet_gateway()
         self.internetgateway = internetgateway
 
-    def aws_create_subnet(self):
-        self.subnet = self.ec2.create_subnet(
-            CidrBlock='172.16.1.0/24',
-            VpcId=self.vpc.id
+    def aws_create_subnet(self, vpc_id, cidr_block):
+        subnet = self.ec2_client.create_subnet(
+            CidrBlock=cidr_block,
+            VpcId=vpc_id
         )
+        self.subnet = subnet
 
     #def aws_create_security_group(self):
     #    self.securitygroup = self.ec2.create_security_group(
