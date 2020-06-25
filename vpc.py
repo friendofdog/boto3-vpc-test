@@ -4,10 +4,10 @@ class AwsVpc:
     def __init__(self):
         self.ec2_client = boto3.client('ec2')
         self.vpc = ''
-        self.internetgateway = ''
-        self.subnet = ''
-        self.securitygroup = ''
-        self.routetable = ''
+        self.ig = ''
+        self.sn = ''
+        self.sg = ''
+        self.rt = ''
 
     def aws_create_vpc(self, cidr_block):
         vpc = self.ec2_client.create_vpc(
@@ -16,25 +16,25 @@ class AwsVpc:
         self.vpc = vpc
 
     def aws_create_internet_gateway(self):
-        internetgateway = self.ec2_client.create_internet_gateway()
-        self.internetgateway = internetgateway
+        ig = self.ec2_client.create_internet_gateway()
+        self.ig = ig
 
     def aws_create_subnet(self, vpc_id, cidr_block):
         subnet = self.ec2_client.create_subnet(
             CidrBlock=cidr_block,
             VpcId=vpc_id
         )
-        self.subnet = subnet
+        self.sn = subnet
 
     #def aws_create_security_group(self):
-    #    self.securitygroup = self.ec2.create_security_group(
+    #    self.sg = self.ec2.create_security_group(
     #        GroupName='SSH-ONLY',
     #        Description='only allow SSH traffic',
     #        VpcId=self.vpc.id
     #    )
 
     #def aws_create_route_table(self):
-    #    self.routetable = self.vpc.create_route_table()
+    #    self.rt = self.vpc.create_route_table()
 
     ## assign a name to our VPC
     #def tag_vpc(self):
@@ -57,25 +57,25 @@ class AwsVpc:
     ## attach internet gateway to VPC
     #def attach_internet_gateway(self):
     #    self.vpc.attach_internet_gateway(
-    #        InternetGatewayId=self.internetgateway.id
+    #        InternetGatewayId=self.ig.id
     #    )
 
     ## create public route on route table
     #def create_public_route_table(self):
-    #    self.routetable.create_route(
+    #    self.rt.create_route(
     #        DestinationCidrBlock='0.0.0.0/0',
-    #        GatewayId=self.internetgateway.id
+    #        GatewayId=self.ig.id
     #    )
 
     ## associate subnet with route table
     #def associate_subnet(self):
-    #    self.routetable.associate_with_subnet(
-    #        SubnetId=self.subnet.id
+    #    self.rt.associate_with_subnet(
+    #        SubnetId=self.sn.id
     #    )
 
     ## allow SSH inbound rule through the VPC on security group
     #def create_ssh_inbound_rule(self):
-    #    self.securitygroup.authorize_ingress(
+    #    self.sg.authorize_ingress(
     #        CidrIp='0.0.0.0/0',
     #        IpProtocol='tcp',
     #        FromPort=22,
@@ -99,10 +99,10 @@ class AwsVpc:
     #        MaxCount=1,
     #        MinCount=1,
     #        NetworkInterfaces=[{
-    #            'SubnetId': self.subnet.id,
+    #            'SubnetId': self.sn.id,
     #            'DeviceIndex': 0,
     #            'AssociatePublicIpAddress': True,
-    #            'Groups': [self.securitygroup.group_id]
+    #            'Groups': [self.sg.group_id]
     #        }],
     #        KeyName='ec2-keypair'
     #    )

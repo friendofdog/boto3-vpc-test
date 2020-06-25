@@ -103,8 +103,8 @@ def test_aws_create_internet_gateway(make_ec2_stub, mock_internet_gateway):
     ig_id = 'igw-c0a643a9'
     ec2_stub, ec2_obj = make_ec2_stub()
     response = mock_internet_gateway(ig_id, ec2_stub, ec2_obj)
-    assert ec2_obj.internetgateway['InternetGateway']['InternetGatewayId'] \
-        == response['InternetGateway']['InternetGatewayId']
+    assert ec2_obj.ig['InternetGateway']['InternetGatewayId'] == \
+        response['InternetGateway']['InternetGatewayId']
 
 def test_aws_create_subnet(make_ec2_stub, mock_vpc, mock_subnet):
     cidr_block = '172.16.1.0/24'
