@@ -2,9 +2,7 @@ import boto3
 
 class AwsVpc:
     def __init__(self):
-        self.ec2 = boto3.resource('ec2')
         self.ec2_client = boto3.client('ec2')
-
         self.vpc = ''
         self.internetgateway = ''
         self.subnet = ''
@@ -18,7 +16,7 @@ class AwsVpc:
         self.vpc = vpc
 
     def aws_create_internet_gateway(self):
-        internetgateway = self.ec2.create_internet_gateway()
+        internetgateway = self.ec2_client.create_internet_gateway()
         self.internetgateway = internetgateway
 
     def aws_create_subnet(self, vpc_id, cidr_block):
