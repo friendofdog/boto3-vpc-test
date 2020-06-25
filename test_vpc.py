@@ -5,64 +5,77 @@ from vpc import AwsVpc
 
 @pytest.fixture
 def make_ec2_stub():
-    def _make_ec2_stub(key):
-        vpc_obj = AwsVpc()
+    def _make_ec2_stub(interface):
+        ec2_obj = AwsVpc()
         service = {
-            'resource': vpc_obj.ec2.meta.client,
-            'client': vpc_obj.ec2_client
+            'resource': ec2_obj.ec2.meta.client,
+            'client': ec2_obj.ec2_client
         }
-        ec2_stub = Stubber(service[key])
-        return ec2_stub, vpc_obj
+        ec2_stub = Stubber(service[interface])
+        return ec2_stub, ec2_obj
 
     yield _make_ec2_stub
 
 
-def test_aws_create_vpc(make_ec2_stub):
-    ec2_stub, vpc_obj = make_ec2_stub('resource')
+@pytest.fixture
+def mock_vpc():
+    def _mock_vpc(vpc_id, cidr_block, ec2_stub, ec2_obj):
+        response = {
+            'Vpc': {
+                'CidrBlock': cidr_block,
+                'VpcId': vpc_id,
+            }
+        }
 
+        expected_params = {
+            'CidrBlock': cidr_block
+        }
+
+        ec2_stub.add_response(
+            'create_vpc',
+            response,
+            expected_params
+        )
+
+        ec2_stub.activate()
+        ec2_obj.aws_create_vpc(cidr_block)
+        return response
+
+    return _mock_vpc
+
+
+@pytest.fixture
+def mock_internet_gateway():
+    def _mock_internet_gateway(ig_id, ec2_stub, ec2_obj):
+        response = {
+            'InternetGateway': {
+                'InternetGatewayId': ig_id
+            }
+        }
+
+        ec2_stub.add_response(
+            'create_internet_gateway',
+            response,
+            {}
+        )
+
+        ec2_stub.activate()
+        ec2_obj.aws_create_internet_gateway()
+        return response
+
+    return _mock_internet_gateway
+
+
+def test_aws_create_vpc(make_ec2_stub, mock_vpc):
+    vpc_id = 'vpc-a01106c2'
     cidr_block = '172.16.0.0/16'
+    ec2_stub, ec2_obj = make_ec2_stub('resource')
+    response = mock_vpc(vpc_id, cidr_block, ec2_stub, ec2_obj)
+    assert ec2_obj.vpc.id == response['Vpc']['VpcId']
 
-    response = {
-        'Vpc': {
-            'CidrBlock': cidr_block,
-            'VpcId': 'vpc-a01106c2',
-        }
-    }
-
-    expected_params = {
-        'CidrBlock': cidr_block
-    }
-
-    ec2_stub.add_response(
-        'create_vpc',
-        response,
-        expected_params
-    )
-
-    ec2_stub.activate()
-
-    vpc_obj.aws_create_vpc(cidr_block)
-
-    assert vpc_obj.vpc.id == response['Vpc']['VpcId']
-
-def test_aws_create_internet_gateway(make_ec2_stub):
-    ec2_stub, vpc_obj = make_ec2_stub('resource')
-
-    response = {
-        'InternetGateway': {
-            'InternetGatewayId': 'igw-c0a643a9'
-        }
-    }
-
-    ec2_stub.add_response(
-        'create_internet_gateway',
-        response,
-        {}
-    )
-
-    ec2_stub.activate()
-
-    vpc_obj.aws_create_internet_gateway()
-
-    assert vpc_obj.internetgateway.id == \
+def test_aws_create_internet_gateway(make_ec2_stub, mock_internet_gateway):
+    ig_id = 'igw-c0a643a9'
+    ec2_stub, ec2_obj = make_ec2_stub('resource')
+    response = mock_internet_gateway(ig_id, ec2_stub, ec2_obj)
+    assert ec2_obj.internetgateway.id == \
         response['InternetGateway']['InternetGatewayId']

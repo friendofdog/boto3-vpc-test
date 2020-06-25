@@ -4,15 +4,16 @@ class AwsVpc:
     def __init__(self):
         self.ec2 = boto3.resource('ec2')
         self.ec2_client = boto3.client('ec2')
+
         self.vpc = ''
         self.internetgateway = ''
         self.subnet = ''
         self.securitygroup = ''
         self.routetable = ''
 
-    def aws_create_vpc(self, ip='172.10.0.0/16'):
+    def aws_create_vpc(self, cidr_block):
         vpc = self.ec2.create_vpc(
-            CidrBlock=ip
+            CidrBlock=cidr_block
         )
         self.vpc = vpc
 
