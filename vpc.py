@@ -26,12 +26,13 @@ class AwsVpc:
         )
         self.sn = subnet
 
-    #def aws_create_security_group(self):
-    #    self.sg = self.ec2.create_security_group(
-    #        GroupName='SSH-ONLY',
-    #        Description='only allow SSH traffic',
-    #        VpcId=self.vpc.id
-    #    )
+    def aws_create_security_group(self, vpc_id, name, desc):
+        security_group = self.ec2_client.create_security_group(
+            GroupName=name,
+            Description=desc,
+            VpcId=vpc_id
+        )
+        self.sg = security_group
 
     #def aws_create_route_table(self):
     #    self.rt = self.vpc.create_route_table()

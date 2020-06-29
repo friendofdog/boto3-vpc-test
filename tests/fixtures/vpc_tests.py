@@ -73,6 +73,7 @@ def mock_subnet():
                 'VpcId': vpc_id,
             }
         }
+
         expected_params = {
             'CidrBlock': cidr_block,
             'VpcId': vpc_id
@@ -89,3 +90,31 @@ def mock_subnet():
         return response
 
     return _mock_subnet
+
+
+@pytest.fixture
+def mock_security_group():
+    def _mock_security_group(name, desc, ec2_stub, ec2_obj):
+        vpc_id = ec2_obj.vpc['Vpc']['VpcId']
+
+        response = {
+            'GroupId': 'sg-903004f8'
+        }
+
+        expected_params = {
+            'GroupName': name,
+            'Description': desc,
+            'VpcId': vpc_id
+        }
+
+        ec2_stub.add_response(
+            'create_security_group',
+            response,
+            expected_params
+        )
+
+        ec2_stub.activate()
+        ec2_obj.aws_create_security_group(vpc_id, name, desc)
+        return response
+
+    return _mock_security_group
