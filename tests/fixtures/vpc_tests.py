@@ -118,3 +118,30 @@ def mock_security_group():
         return response
 
     return _mock_security_group
+
+
+@pytest.fixture
+def mock_route_table():
+    def _mock_route_table(vpc_id, ec2_stub, ec2_obj):
+        response = {
+            'RouteTable': {
+                'VpcId': vpc_id,
+            }
+        }
+
+        expected_params = {
+            'VpcId': vpc_id
+        }
+
+        ec2_stub.add_response(
+            'create_route_table',
+            response,
+            expected_params
+        )
+
+        ec2_stub.activate()
+        ec2_obj.aws_create_route_table(vpc_id)
+        return response
+
+    return _mock_route_table
+

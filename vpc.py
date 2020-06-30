@@ -34,8 +34,11 @@ class AwsVpc:
         )
         self.sg = security_group
 
-    #def aws_create_route_table(self):
-    #    self.rt = self.vpc.create_route_table()
+    def aws_create_route_table(self, vpc_id):
+        route_table = self.ec2_client.create_route_table(
+            VpcId=vpc_id
+        )
+        self.rt = route_table
 
     ## assign a name to our VPC
     #def tag_vpc(self):

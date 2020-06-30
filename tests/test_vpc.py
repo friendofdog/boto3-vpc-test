@@ -31,3 +31,13 @@ def test_aws_create_security_group(make_ec2_stub, mock_vpc, mock_security_group)
     mock_vpc(vpc_id, cidr_block, ec2_stub, ec2_obj)
     response = mock_security_group(name, desc, ec2_stub, ec2_obj)
     assert ec2_obj.sg['GroupId'] == response['GroupId']
+
+def test_aws_create_route_table(make_ec2_stub, mock_vpc, mock_route_table):
+    cidr_block = '172.16.1.0/24'
+    vpc_id = 'vpc-a01106c2'
+    ec2_stub, ec2_obj = make_ec2_stub()
+    mock_vpc(vpc_id, cidr_block, ec2_stub, ec2_obj)
+    response = mock_route_table(vpc_id, ec2_stub, ec2_obj)
+    print(response)
+    assert ec2_obj.rt['RouteTable']['VpcId'] == response['RouteTable']['VpcId']
+
